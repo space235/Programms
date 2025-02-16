@@ -1,0 +1,62 @@
+#include <stdio.h>
+#define MAX_MOVIES 100
+
+void addMovie(Movie movies[], int *count);
+void displayMovies(const Movie movies[], int count);
+void searchByYear(const Movie movies[], int count, int year);
+
+typedef struct {
+    char title[50];
+    char director[50];
+    int year;
+    int duration;
+} Movie;
+
+int main() {
+    Movie movies[MAX_MOVIES];
+    int count = 0, choice, year;
+    do {
+        printf("1. Add Movie\n2. Display Movies\n3. Search by Year\n4. Exit\nChoice: ");
+        scanf("%d", &choice);
+        if (choice == 1) {
+            addMovie(movies, &count);
+        } else if (choice == 2) {
+            displayMovies(movies, count);
+        } else if (choice == 3) {
+            printf("Enter year to search: ");
+            scanf("%d", &year);
+            searchByYear(movies, count, year);
+        }
+    } while (choice != 4);
+    return 0;
+}
+
+void addMovie(Movie movies[], int *count) {
+    if (*count >= MAX_MOVIES) {
+        printf("Archive is full!\n");
+        return;
+    }
+    printf("Enter title: ");
+    scanf(" %[^"]", movies[*count].title);
+    printf("Enter director: ");
+    scanf(" %[^"]", movies[*count].director);
+    printf("Enter year: ");
+    scanf("%d", &movies[*count].year);
+    printf("Enter duration (in minutes): ");
+    scanf("%d", &movies[*count].duration);
+    (*count)++;
+}
+
+void displayMovies(const Movie movies[], int count) {
+    for (int i = 0; i < count; i++) {
+        printf("%s (%d), Directed by %s, Duration: %d min\n", movies[i].title, movies[i].year, movies[i].director, movies[i].duration);
+    }
+}
+
+void searchByYear(const Movie movies[], int count, int year) {
+    for (int i = 0; i < count; i++) {
+        if (movies[i].year == year) {
+            printf("%s, Directed by %s, Duration: %d min\n", movies[i].title, movies[i].director, movies[i].duration);
+        }
+    }
+}
