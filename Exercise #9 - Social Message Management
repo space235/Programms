@@ -1,0 +1,80 @@
+#include <stdio.h>
+#define MAX_MESSAGES 100
+
+typedef struct {
+    char sender[50];
+    char receiver[50];
+    char timestamp[50];
+    char content[200];
+} Message;
+
+void sendMessage(Message messages[], int *count);
+void displayMessages(const Message messages[], int count, const char user[]);
+void saveMessagesToFile(const Message messages[], int count, const char *filename);
+void loadMessagesFromFile(Message messages[], int *count, const char *filename);
+
+int main() {
+    Message messages[MAX_MESSAGES];
+    int count = 0, choice;
+    char user[50];
+    loadMessagesFromFile(messages, &count, "messages.dat");
+    
+    do {
+        printf("1. Send Message\n2. View Messages\n3. Save & Exit\nChoice: ");
+        scanf("%d", &choice);
+        if (choice == 1) {
+            sendMessage(messages, &count);
+        } else if (choice == 2) {
+            printf("Enter username: ");
+            scanf(" %[^"]", user);
+            displayMessages(messages, count, user);
+        }
+    } while (choice != 3);
+    
+    saveMessagesToFile(messages, count, "messages.dat");
+    return 0;
+}
+
+void sendMessage(Message messages[], int *count) {
+    if (*count >= MAX_MESSAGES) {
+        printf("Message storage full!\n");
+        return;
+    }
+    printf("Enter sender: ");
+    scanf(" %[^"]", messages[*count].sender);
+    printf("Enter receiver: ");
+    scanf(" %[^"]", messages[*count].receiver);
+    printf("Enter timestamp: ");
+    scanf(" %[^"]", messages[*count].timestamp);
+    printf("Enter message: ");
+    scanf(" %[^"]", messages[*count].content);
+    (*count)++;
+}
+
+void displayMessages(const Message messages[], int count, const char user[]) {
+    for (int i = 0; i < count; i++) {
+        if (strcmp(messages[i].sender, user) == 0 || strcmp(messages[i].receiver, user) == 0) {
+            printf("From: %s, To: %s, At: %s\nMessage: %s\n", messages[i].sender, messages[i].receiver, messages[i].timestamp, messages[i].content);
+        }
+    }
+}
+
+void saveMessagesToFile(const Message messages[], int count, const char *filename) {
+    FILE *file = fopen(filename, "w");
+    if (!file) {
+        printf("Error opening file!\n");
+        return;
+    }
+    fwrite(messages, sizeof(Message), count, file);
+    fclose(file);
+}
+
+void loadMessagesFromFile(Message messages[], int *count, const char *filename) {
+    FILE *file = fopen(filename, "r");
+    if (!file) {
+        printf("No existing messages found.\n");
+        return;
+    }
+    *count = fread(messages, sizeof(Message), MAX_MESSAGES, file);
+    fclose(file);
+}
